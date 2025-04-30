@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse
 from typing import List
 from models import Client, HealthProgram, ClientCreate, ProgramCreate, ProgramEnrollment
 from datetime import datetime
@@ -154,4 +155,60 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user["username"]},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return {"access_token": access_token, "token_type": "bearer"} 
+    return {"access_token": access_token, "token_type": "bearer"}
+
+# Custom landing page
+@app.get("/", response_class=HTMLResponse)
+async def read_root():
+    return """
+    <html>
+        <head>
+            <title>Health Information System</title>
+            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+            <style>
+                body {
+                    font-family: 'Poppins', sans-serif;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    line-height: 1.6;
+                }
+                h1 {
+                    color: #2c3e50;
+                }
+                .links {
+                    margin-top: 20px;
+                }
+                a {
+                    display: inline-block;
+                    margin-right: 20px;
+                    color: #3498db;
+                    text-decoration: none;
+                }
+                a:hover {
+                    text-decoration: underline;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Welcome to the Health Information System API</h1>
+            <p>This API allows you to manage health programs and client information.</p>
+            
+            <div class="links">
+                <h2>API Documentation:</h2>
+                <a href="/docs">Swagger UI</a>
+                <a href="/redoc">ReDoc</a>
+            </div>
+            
+            <div class="links">
+                <h2>Available Endpoints:</h2>
+                <ul>
+                    <li><strong>Authentication:</strong> POST /token</li>
+                    <li><strong>Programs:</strong> GET /programs/, POST /programs/</li>
+                    <li><strong>Clients:</strong> GET /clients/, POST /clients/, GET /clients/{id}</li>
+                    <li><strong>Enrollments:</strong> POST /enrollments/</li>
+                </ul>
+            </div>
+        </body>
+    </html>
+    """ 
